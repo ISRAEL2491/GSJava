@@ -16,13 +16,15 @@ public class AparelhoDAO {
     }
 
     public void create(AparelhoTO aparelho) throws AparelhoException {
-        String sql = "INSERT INTO aparelhos (id_usuario, nome, potencia_watts, horas_uso_dia) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO aparelhos (id_aparelho, id_usuario, nome, potencia_watts, horas_uso_dia, dataAdicionado) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, aparelho.getIdUsuario());
-            stmt.setString(2, aparelho.getNome());
-            stmt.setFloat(3, aparelho.getPotenciaWatts());
-            stmt.setFloat(4, aparelho.getHorasUsoDia());
+            stmt.setInt(1, aparelho.getIdAparelho());
+            stmt.setInt(2, aparelho.getIdUsuario());
+            stmt.setString(3, aparelho.getNome());
+            stmt.setFloat(4, aparelho.getPotenciaWatts());
+            stmt.setFloat(5, aparelho.getHorasUsoDia());
+            stmt.setTimestamp(6, aparelho.getDataAdicionado());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new AparelhoException("Erro ao inserir aparelho: " + e.getMessage());
