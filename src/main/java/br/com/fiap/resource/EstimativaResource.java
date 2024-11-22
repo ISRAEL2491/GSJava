@@ -3,9 +3,14 @@ package br.com.fiap.resource;
 import br.com.fiap.bo.EstimativaBO;
 import br.com.fiap.exception.EstimativaException;
 import br.com.fiap.to.EstimativaTO;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/estimativas")
@@ -15,58 +20,102 @@ public class EstimativaResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response criarEstimativa(EstimativaTO estimativa) {
+    public Response create(@Valid EstimativaTO estimativa) {
         try {
-            estimativaBO.criarEstimativa(estimativa);
-            return Response.status(Response.Status.CREATED).entity(estimativa).build();
+            EstimativaTO resultado = estimativaBO.create(estimativa);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.created(null); //201 - CREATED
+            }else {
+                response = Response.status(400); //400 - BAD REQUEST
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (EstimativaException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage())
+                    .build();
         }
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listarEstimativas() throws EstimativaException {
-        List<EstimativaTO> estimativas = estimativaBO.listarEstimativas();
-        return Response.ok(estimativas).build();
+    public Response findAll() {
+        try {
+            ArrayList<EstimativaTO> resultado = estimativaBO.findAll();
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.ok(); //200 (OK)
+            }else {
+                response = Response.status(404); //404 (NOT FOUND)
+            }
+            response.entity(resultado);
+            return response.build();
+        } catch (EstimativaException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build(); // 500 - Internal Server Error
+        }
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/{id_estimativa}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buscarEstimativaPorId(@PathParam("id") Integer id) {
+    public Response findById(@PathParam("id_estimativa") Long idEstimativa) {
         try {
-            EstimativaTO estimativa = estimativaBO.buscarEstimativaPorId(id);
-            return Response.ok(estimativa).build();
+            EstimativaTO resultado = estimativaBO.findById(idEstimativa);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.ok(); //200 (OK)
+            }else {
+                response = Response.status(404); //404 (NOT FOUND)
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (EstimativaException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("/{id_estimativa}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response atualizarEstimativa(@PathParam("id") Integer id, EstimativaTO estimativa) {
+    public Response update(@PathParam("id_estimativa") Long idEstimativa, @Valid EstimativaTO estimativa) throws SQLException {
         try {
-            estimativa.setIdEstimativa(id);
-            estimativaBO.atualizarEstimativa(estimativa);
-            return Response.status(Response.Status.OK).entity(estimativa).build();
+            estimativa.setIdEstimativa(idEstimativa);
+            EstimativaTO resultado = estimativaBO.update(estimativa);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.created(null); //201 - CREATED
+            }else {
+                response = Response.status(400); //400 - BAD REQUEST
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (EstimativaException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 
     @DELETE
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response excluirEstimativa(@PathParam("id") Integer id) {
+    @Path("/{id_estimativa}")
+    public Response delete(@PathParam("id_estimativa") Long idEstimativa) {
         try {
-            estimativaBO.excluirEstimativa(id);
-            return Response.status(Response.Status.NO_CONTENT).build();
+            Response.ResponseBuilder response = null;
+            if (estimativaBO.delete(idEstimativa)){
+                response = Response.status(204); //204 - NO CONTENT
+            }else {
+                response = Response.status(404); //404 - NOT FOUND
+            }
+            return response.build();
         } catch (EstimativaException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 }

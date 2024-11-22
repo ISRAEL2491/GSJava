@@ -7,98 +7,113 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAO {
+public class UsuarioDAO extends Repository{
 
-    private Connection connection;
-
-    public UsuarioDAO(Connection connection) {
-        this.connection = connection;
-    }
-
-    // Criar um usuário
-    public void create(UsuarioTO usuario) throws UsuarioException {
+    public UsuarioTO create(UsuarioTO usuario) throws UsuarioException {
         String sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new UsuarioException("Erro ao inserir usuário: " + e.getMessage());
-        }
-    }
-
-    // Listar todos os usuários
-    public List<UsuarioTO> findAll() throws UsuarioException {
-        List<UsuarioTO> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios";
-
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                UsuarioTO usuario = new UsuarioTO();
-                usuario.setIdUsuario(rs.getInt("id_usuario"));
-                usuario.setNome(rs.getString("nome"));
-                usuario.setEmail(rs.getString("email"));
-                usuario.setSenha(rs.getString("senha"));
-                usuario.setDataCadastro(rs.getTimestamp("data_cadastro"));
-                usuarios.add(usuario);
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, usuario.getNome());
+            ps.setString(2, usuario.getEmail());
+            ps.setString(3, usuario.getSenha());
+            if (ps.executeUpdate() > 0){
+                return usuario;
+            }else {
+                return null;
             }
         } catch (SQLException e) {
+            throw new UsuarioException("Erro ao inserir usuário: " + e.getMessage());
+        }finally {
+            closeConnection();
+        }
+
+    }
+
+    public ArrayList<UsuarioTO> findAll() throws UsuarioException {
+        ArrayList<UsuarioTO> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios order by id_usuario";
+
+        try(PreparedStatement ps = getConnection().prepareStatement(sql)){
+            ResultSet rs = ps.executeQuery();
+
+            if (rs != null){
+                while (rs.next()) {
+                    UsuarioTO usuario = new UsuarioTO();
+                    usuario.setIdUsuario(rs.getLong("id_usuario"));
+                    usuario.setNome(rs.getString("nome"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setSenha(rs.getString("senha"));
+                    usuarios.add(usuario);
+                }
+            }else {
+                return null;
+            }
+
+        } catch (SQLException e) {
             throw new UsuarioException("Erro ao listar usuários: " + e.getMessage());
+        }finally {
+            closeConnection();
         }
         return usuarios;
     }
 
-    // Buscar um usuário por ID
-    public UsuarioTO findById(int id) throws UsuarioException {
+    public UsuarioTO findById(Long idUsuario) throws UsuarioException {
+        UsuarioTO usuario = new UsuarioTO();
         String sql = "SELECT * FROM usuarios WHERE id_usuario = ?";
-        UsuarioTO usuario = null;
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+        try(PreparedStatement ps = getConnection().prepareStatement(sql)){
+            ps.setLong(1, idUsuario);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                usuario = new UsuarioTO();
-                usuario.setIdUsuario(rs.getInt("id_usuario"));
+                usuario.setIdUsuario(rs.getLong("id_usuario"));
                 usuario.setNome(rs.getString("nome"));
                 usuario.setEmail(rs.getString("email"));
                 usuario.setSenha(rs.getString("senha"));
-                usuario.setDataCadastro(rs.getTimestamp("data_cadastro"));
+            }else {
+                return null;
             }
         } catch (SQLException e) {
             throw new UsuarioException("Erro ao buscar usuário: " + e.getMessage());
+        }finally {
+            closeConnection();
         }
         return usuario;
     }
 
     // Atualizar um usuário
-    public void update(UsuarioTO usuario) throws UsuarioException {
+    public UsuarioTO update(UsuarioTO usuario) throws UsuarioException {
         String sql = "UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id_usuario = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha());
-            stmt.setInt(4, usuario.getIdUsuario());
-            stmt.executeUpdate();
+        try(PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, usuario.getNome());
+            ps.setString(2, usuario.getEmail());
+            ps.setString(3, usuario.getSenha());
+            ps.setLong(4, usuario.getIdUsuario());
+            if (ps.executeUpdate() > 0){
+                return usuario;
+            }else{
+                return null;
+            }
         } catch (SQLException e) {
             throw new UsuarioException("Erro ao atualizar usuário: " + e.getMessage());
+        }finally {
+            closeConnection();
         }
+
     }
 
     // Deletar um usuário
-    public void delete(int id) throws UsuarioException {
+    public boolean delete(Long idUsuario) throws UsuarioException {
         String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setLong(1, idUsuario);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new UsuarioException("Erro ao excluir usuário: " + e.getMessage());
+        }finally {
+            closeConnection();
         }
     }
 }

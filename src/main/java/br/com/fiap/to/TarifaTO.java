@@ -1,10 +1,12 @@
 package br.com.fiap.to;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
+
+
+import java.util.Date;
 
 public class TarifaTO {
-    private Integer idTarifa;
+    private Long idTarifa;
 
     @NotNull(message = "O nome da tarifa não pode ser nulo")
     private String nomeTarifa;
@@ -13,17 +15,17 @@ public class TarifaTO {
     private Float valorKwh;
 
     @NotNull(message = "A data de início não pode ser nula")
-    private LocalDate dataInicio;
+    private Date dataInicio;
 
-    private LocalDate dataFim;
+    private Date dataFim;
 
     // Construtor sem parâmetros
     public TarifaTO() {
     }
 
     // Construtor com parâmetros
-    public TarifaTO(@NotNull Integer idTarifa, @NotNull String nomeTarifa, @NotNull Float valorKwh,
-                    @NotNull LocalDate dataInicio, LocalDate dataFim) {
+    public TarifaTO(@NotNull Long idTarifa, @NotNull String nomeTarifa, @NotNull Float valorKwh,
+                    @NotNull Date dataInicio, Date dataFim) {
         this.idTarifa = idTarifa;
         this.nomeTarifa = nomeTarifa;
         this.valorKwh = valorKwh;
@@ -32,11 +34,11 @@ public class TarifaTO {
     }
 
     // Getters e Setters
-    public Integer getIdTarifa() {
+    public Long getIdTarifa() {
         return idTarifa;
     }
 
-    public void setIdTarifa(Integer idTarifa) {
+    public void setIdTarifa(Long idTarifa) {
         this.idTarifa = idTarifa;
     }
 
@@ -56,19 +58,19 @@ public class TarifaTO {
         this.valorKwh = valorKwh;
     }
 
-    public LocalDate getDataInicio() {
-        return dataInicio;
+    public java.sql.Date getDataInicio() {
+        return (java.sql.Date) dataInicio;
     }
 
-    public void setDataInicio(LocalDate dataInicio) {
+    public void setDataInicio(Date dataInicio) {
         this.dataInicio = dataInicio;
     }
 
-    public LocalDate getDataFim() {
-        return dataFim;
+    public java.sql.Date getDataFim() {
+        return (java.sql.Date) dataFim;
     }
 
-    public void setDataFim(LocalDate dataFim) {
+    public void setDataFim(Date dataFim) {
         this.dataFim = dataFim;
     }
 }

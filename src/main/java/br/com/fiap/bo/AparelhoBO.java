@@ -4,92 +4,87 @@ import br.com.fiap.dao.AparelhoDAO;
 import br.com.fiap.exception.AparelhoException;
 import br.com.fiap.to.AparelhoTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AparelhoBO {
 
     private AparelhoDAO aparelhoDAO;
 
-    // Construtor para injetar o DAO
-    public AparelhoBO() {
-        this.aparelhoDAO = aparelhoDAO;
-    }
-
-    // Método para criar um aparelho
-    public void criarAparelho(AparelhoTO aparelho) throws AparelhoException {
-        if (aparelho.getNome() == null || aparelho.getNome().isEmpty()) {
-            throw new AparelhoException("O nome do aparelho não pode ser nulo ou vazio.");
-        }
-        if (aparelho.getPotenciaWatts() <= 0) {
-            throw new AparelhoException("A potência do aparelho deve ser maior que zero.");
+    // Método para criação de um aparelho
+    public AparelhoTO create(AparelhoTO aparelho) throws AparelhoException {
+        if (aparelho == null || aparelho.getNome() == null || aparelho.getNome().isEmpty() ||
+                aparelho.getPotenciaWatts() == null || aparelho.getPotenciaWatts() <= 0 ||
+                aparelho.getHorasUsoDia() == null || aparelho.getHorasUsoDia() <= 0) {
+            throw new AparelhoException("Dados do aparelho inválidos. Nome, potência e horas de uso diárias são obrigatórios.");
         }
 
-        // Lógica para salvar o aparelho no banco de dados (DAO)
         try {
-            aparelhoDAO.create(aparelho);
+            aparelhoDAO = new AparelhoDAO();
+            return aparelhoDAO.create(aparelho);
         } catch (Exception e) {
-            throw new AparelhoException("Erro ao criar o aparelho: " + e.getMessage());
+            throw new AparelhoException("Erro ao criar aparelho: " + e.getMessage());
         }
     }
 
     // Método para listar todos os aparelhos
-    public List<AparelhoTO> listarAparelhos() {
-        // Lógica para listar todos os aparelhos (DAO)
+    public ArrayList<AparelhoTO> findAll() throws AparelhoException {
         try {
+            aparelhoDAO = new AparelhoDAO();
             return aparelhoDAO.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao listar aparelhos: " + e.getMessage());
+            throw new AparelhoException("Erro ao listar aparelhos: " + e.getMessage());
         }
     }
 
-    // Método para buscar aparelho por ID
-    public AparelhoTO buscarAparelhoPorId(Integer id) throws AparelhoException {
-        if (id == null || id <= 0) {
-            throw new AparelhoException("O ID do aparelho deve ser válido.");
+    // Método para buscar um aparelho pelo ID
+    public AparelhoTO findById(Long idAparelho) throws AparelhoException {
+        if (idAparelho == null || idAparelho <= 0) {
+            throw new AparelhoException("ID do aparelho não pode ser nulo ou menor que zero.");
         }
 
-        // Lógica para buscar aparelho por ID (DAO)
-        AparelhoTO aparelho = aparelhoDAO.findById(id);
-        if (aparelho == null) {
-            throw new AparelhoException("Aparelho não encontrado com o ID fornecido.");
+        try {
+            aparelhoDAO = new AparelhoDAO();
+            return aparelhoDAO.findById(idAparelho);
+        } catch (Exception e) {
+            throw new AparelhoException("Erro ao buscar aparelho: " + e.getMessage());
         }
-        return aparelho;
     }
 
     // Método para atualizar um aparelho
-    public void atualizarAparelho(AparelhoTO aparelho) throws AparelhoException {
-        if (aparelho.getIdAparelho() == null || aparelho.getIdAparelho() <= 0) {
-            throw new AparelhoException("O ID do aparelho para atualização é inválido.");
+    public AparelhoTO update(AparelhoTO aparelho) throws AparelhoException {
+        if (aparelho == null || aparelho.getIdAparelho() == null) {
+            throw new AparelhoException("ID do aparelho inválido.");
         }
         if (aparelho.getNome() == null || aparelho.getNome().isEmpty()) {
             throw new AparelhoException("O nome do aparelho não pode ser nulo ou vazio.");
         }
-        if (aparelho.getPotenciaWatts() <= 0) {
-            throw new AparelhoException("A potência do aparelho deve ser maior que zero.");
+        if (aparelho.getPotenciaWatts() == null || aparelho.getPotenciaWatts() <= 0) {
+            throw new AparelhoException("A potência do aparelho não pode ser nula ou menor que zero.");
+        }
+        if (aparelho.getHorasUsoDia() == null || aparelho.getHorasUsoDia() <= 0) {
+            throw new AparelhoException("As horas de uso diário não podem ser nulas ou menores que zero.");
         }
 
-        // Lógica para atualizar o aparelho no banco de dados (DAO)
         try {
-            aparelhoDAO.update(aparelho);
+            aparelhoDAO = new AparelhoDAO();
+            return aparelhoDAO.update(aparelho);
         } catch (Exception e) {
-            throw new AparelhoException("Erro ao atualizar o aparelho: " + e.getMessage());
+            throw new AparelhoException("Erro ao atualizar aparelho: " + e.getMessage());
         }
     }
 
     // Método para excluir um aparelho
-    public void excluirAparelho(Integer id) throws AparelhoException {
-        if (id == null || id <= 0) {
-            throw new AparelhoException("O ID do aparelho para exclusão é inválido.");
+    public boolean delete(Long idAparelho) throws AparelhoException {
+        if (idAparelho == null || idAparelho <= 0) {
+            throw new AparelhoException("ID do aparelho não pode ser nulo ou menor que zero.");
         }
 
-        // Lógica para excluir o aparelho no banco de dados (DAO)
         try {
-            boolean deleted = aparelhoDAO.delete(id);
-            if (!deleted) {
-                throw new AparelhoException("Aparelho não encontrado para exclusão.");
-            }
+            aparelhoDAO = new AparelhoDAO();
+            return aparelhoDAO.delete(idAparelho);
         } catch (Exception e) {
-            throw new AparelhoException("Erro ao excluir o aparelho: " + e.getMessage());
+            throw new AparelhoException("Erro ao excluir aparelho: " + e.getMessage());
         }
     }
 }

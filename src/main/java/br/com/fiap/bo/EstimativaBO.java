@@ -3,84 +3,76 @@ package br.com.fiap.bo;
 import br.com.fiap.dao.EstimativaDAO;
 import br.com.fiap.exception.EstimativaException;
 import br.com.fiap.to.EstimativaTO;
-import java.util.List;
+
+import java.util.ArrayList;
 
 public class EstimativaBO {
 
     private EstimativaDAO estimativaDAO;
 
-    // Construtor para injetar o DAO
-    public EstimativaBO() {
-        this.estimativaDAO = estimativaDAO;
-    }
-
-    // Método para criar uma estimativa
-    public void criarEstimativa(EstimativaTO estimativa) throws EstimativaException {
-        if (estimativa.getConsumoEstimado() <= 0) {
-            throw new EstimativaException("O consumo estimado deve ser maior que zero.");
+    public EstimativaTO create(EstimativaTO estimativa) throws EstimativaException {
+        if (estimativa == null || estimativa.getConsumoEstimado() == null || estimativa.getConsumoEstimado() <= 0 ||
+                estimativa.getDataInicio() == null) {
+            throw new EstimativaException("Dados da estimativa inválidos. Consumo estimado e data de início são obrigatórios.");
         }
 
-        if (estimativa.getDataInicio() == null) {
-            throw new EstimativaException("A data de início da estimativa não pode ser nula.");
-        }
-
-        // Lógica para salvar a estimativa no banco de dados
         try {
-            estimativaDAO.create(estimativa);
+            estimativaDAO = new EstimativaDAO();
+            return estimativaDAO.create(estimativa);
         } catch (Exception e) {
             throw new EstimativaException("Erro ao criar estimativa: " + e.getMessage());
         }
     }
 
-    // Método para listar todas as estimativas
-    public List<EstimativaTO> listarEstimativas() throws EstimativaException {
+    public ArrayList<EstimativaTO> findAll() throws EstimativaException {
         try {
+            estimativaDAO = new EstimativaDAO();
             return estimativaDAO.findAll();
         } catch (Exception e) {
             throw new EstimativaException("Erro ao listar estimativas: " + e.getMessage());
         }
     }
 
-    // Método para buscar estimativa por ID
-    public EstimativaTO buscarEstimativaPorId(Integer id) throws EstimativaException {
-        if (id == null || id <= 0) {
+    public EstimativaTO findById(Long idEstimativa) throws EstimativaException {
+        if (idEstimativa == null || idEstimativa <= 0) {
             throw new EstimativaException("ID da estimativa não pode ser nulo ou menor que zero.");
         }
 
         try {
-            return estimativaDAO.findById(id);
+            estimativaDAO = new EstimativaDAO();
+            return estimativaDAO.findById(idEstimativa);
         } catch (Exception e) {
             throw new EstimativaException("Erro ao buscar estimativa: " + e.getMessage());
         }
     }
 
-    // Método para atualizar uma estimativa
-    public void atualizarEstimativa(EstimativaTO estimativa) throws EstimativaException {
-        if (estimativa.getConsumoEstimado() <= 0) {
-            throw new EstimativaException("O consumo estimado deve ser maior que zero.");
+    public EstimativaTO update(EstimativaTO estimativa) throws EstimativaException {
+        if (estimativa == null || estimativa.getIdEstimativa() == null || estimativa.getIdEstimativa() <= 0) {
+            throw new EstimativaException("ID da estimativa inválido.");
         }
-
+        if (estimativa.getConsumoEstimado() == null || estimativa.getConsumoEstimado() <= 0) {
+            throw new EstimativaException("O consumo estimado não pode ser nulo ou menor que zero.");
+        }
         if (estimativa.getDataInicio() == null) {
-            throw new EstimativaException("A data de início da estimativa não pode ser nula.");
+            throw new EstimativaException("A data de início não pode ser nula.");
         }
 
-        // Lógica para atualizar a estimativa no banco de dados
         try {
-            estimativaDAO.update(estimativa);
+            estimativaDAO = new EstimativaDAO();
+            return estimativaDAO.update(estimativa);
         } catch (Exception e) {
             throw new EstimativaException("Erro ao atualizar estimativa: " + e.getMessage());
         }
     }
 
-    // Método para excluir uma estimativa
-    public void excluirEstimativa(Integer id) throws EstimativaException {
-        if (id == null || id <= 0) {
+    public boolean delete(Long idEstimativa) throws EstimativaException {
+        if (idEstimativa == null || idEstimativa <= 0) {
             throw new EstimativaException("ID da estimativa não pode ser nulo ou menor que zero.");
         }
 
-        // Lógica para excluir a estimativa no banco de dados
         try {
-            estimativaDAO.delete(id);
+            estimativaDAO = new EstimativaDAO();
+            return estimativaDAO.delete(idEstimativa);
         } catch (Exception e) {
             throw new EstimativaException("Erro ao excluir estimativa: " + e.getMessage());
         }

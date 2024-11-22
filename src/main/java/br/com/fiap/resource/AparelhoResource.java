@@ -3,9 +3,14 @@ package br.com.fiap.resource;
 import br.com.fiap.bo.AparelhoBO;
 import br.com.fiap.exception.AparelhoException;
 import br.com.fiap.to.AparelhoTO;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/aparelhos")
@@ -15,58 +20,102 @@ public class AparelhoResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response criarAparelho(AparelhoTO aparelho) {
+    public Response create(@Valid AparelhoTO aparelho) {
         try {
-            aparelhoBO.criarAparelho(aparelho);
-            return Response.status(Response.Status.CREATED).entity(aparelho).build();
+            AparelhoTO resultado = aparelhoBO.create(aparelho);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.created(null); //201 - CREATED
+            }else {
+                response = Response.status(400); //400 - BAD REQUEST
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (AparelhoException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage())
+                    .build();
         }
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listarAparelhos() {
-        List<AparelhoTO> aparelhos = aparelhoBO.listarAparelhos();
-        return Response.ok(aparelhos).build();
+    public Response findAll() {
+        try {
+            ArrayList<AparelhoTO> resultado = aparelhoBO.findAll();
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.ok(); //200 (OK)
+            }else {
+                response = Response.status(404); //404 (NOT FOUND)
+            }
+            response.entity(resultado);
+            return response.build();
+        } catch (AparelhoException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build(); // 500 - Internal Server Error
+        }
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/{id_consumo}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buscarAparelhoPorId(@PathParam("id") Integer id) {
+    public Response findById(@PathParam("id_consumo") Long idAparelho) {
         try {
-            AparelhoTO aparelho = aparelhoBO.buscarAparelhoPorId(id);
-            return Response.ok(aparelho).build();
+            AparelhoTO resultado = aparelhoBO.findById(idAparelho);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.ok(); //200 (OK)
+            }else {
+                response = Response.status(404); //404 (NOT FOUND)
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (AparelhoException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("/{id_consumo}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response atualizarAparelho(@PathParam("id") Integer id, AparelhoTO aparelho) {
+    public Response update(@PathParam("id_consumo") Long idAparelho, @Valid AparelhoTO aparelho) throws SQLException {
         try {
-            aparelho.setIdAparelho(id);
-            aparelhoBO.atualizarAparelho(aparelho);
-            return Response.status(Response.Status.OK).entity(aparelho).build();
+            aparelho.setIdAparelho(idAparelho);
+            AparelhoTO resultado = aparelhoBO.update(aparelho);
+            Response.ResponseBuilder response = null;
+            if (resultado != null){
+                response = Response.created(null); //201 - CREATED
+            }else {
+                response = Response.status(400); //400 - BAD REQUEST
+            }
+            response.entity(resultado);
+            return response.build();
         } catch (AparelhoException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 
     @DELETE
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response excluirAparelho(@PathParam("id") Integer id) {
+    @Path("/{id_consumo}")
+    public Response delete(@PathParam("id_consumo") Long idAparelho) {
         try {
-            aparelhoBO.excluirAparelho(id);
-            return Response.status(Response.Status.NO_CONTENT).build();
+            Response.ResponseBuilder response = null;
+            if (aparelhoBO.delete(idAparelho)){
+                response = Response.status(204); //204 - NO CONTENT
+            }else {
+                response = Response.status(404); //404 - NOT FOUND
+            }
+            return response.build();
         } catch (AparelhoException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build(); // 400 - Bad Request
         }
     }
 }

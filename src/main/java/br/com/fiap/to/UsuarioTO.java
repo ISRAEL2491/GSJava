@@ -1,11 +1,12 @@
 package br.com.fiap.to;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Email;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 import java.sql.Timestamp;
 
 public class UsuarioTO {
-    private Integer idUsuario;
+    private Long idUsuario;
 
     @NotNull(message = "O nome não pode ser nulo")
     private String nome;
@@ -17,28 +18,25 @@ public class UsuarioTO {
     @NotNull(message = "A senha não pode ser nula")
     private String senha;
 
-    private Timestamp dataCadastro;
-
     // Construtor sem parâmetros
     public UsuarioTO() {
     }
 
     // Construtor com parâmetros
-    public UsuarioTO(@NotNull Integer idUsuario, @NotNull String nome, @NotNull @Email String email,
-                     @NotNull String senha, Timestamp dataCadastro) {
+    public UsuarioTO(@NotNull Long idUsuario, @NotNull String nome, @NotNull @Email String email,
+                     @NotNull String senha) {
         this.idUsuario = idUsuario;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.dataCadastro = dataCadastro;
     }
 
     // Getters e Setters
-    public Integer getIdUsuario() {
+    public Long getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(Integer idUsuario) {
+    public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
     }
 
@@ -66,11 +64,4 @@ public class UsuarioTO {
         this.senha = senha;
     }
 
-    public Timestamp getDataCadastro() {
-        return dataCadastro;
-    }
-
-    public void setDataCadastro(Timestamp dataCadastro) {
-        this.dataCadastro = dataCadastro;
-    }
 }

@@ -1,13 +1,11 @@
 package br.com.fiap.to;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.sql.Timestamp;
 
 public class AparelhoTO {
-    private Integer idAparelho;
-
-    @NotNull(message = "O ID do usuário não pode ser nulo")
-    private Integer idUsuario;
+    private Long idAparelho;
 
     @NotNull(message = "O nome do aparelho não pode ser nulo")
     private String nome;
@@ -18,38 +16,26 @@ public class AparelhoTO {
     @NotNull(message = "As horas de uso diárias não podem ser nulas")
     private Float horasUsoDia;
 
-    private Timestamp dataAdicionado;
-
     // Construtor sem parâmetros
     public AparelhoTO() {
     }
 
     // Construtor com parâmetros
-    public AparelhoTO(@NotNull Integer idAparelho, @NotNull Integer idUsuario, @NotNull String nome,
-                      @NotNull Float potenciaWatts, @NotNull Float horasUsoDia, Timestamp dataAdicionado) {
+    public AparelhoTO(@NotNull Long idAparelho, @NotNull String nome,
+                      @NotNull Float potenciaWatts, @NotNull Float horasUsoDia) {
         this.idAparelho = idAparelho;
-        this.idUsuario = idUsuario;
         this.nome = nome;
         this.potenciaWatts = potenciaWatts;
         this.horasUsoDia = horasUsoDia;
-        this.dataAdicionado = dataAdicionado;
     }
 
     // Getters e Setters
-    public Integer getIdAparelho() {
+    public Long getIdAparelho() {
         return idAparelho;
     }
 
-    public void setIdAparelho(Integer idAparelho) {
+    public void setIdAparelho(Long idAparelho) {
         this.idAparelho = idAparelho;
-    }
-
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
     }
 
     public String getNome() {
@@ -76,11 +62,4 @@ public class AparelhoTO {
         this.horasUsoDia = horasUsoDia;
     }
 
-    public Timestamp getDataAdicionado() {
-        return dataAdicionado;
-    }
-
-    public void setDataAdicionado(Timestamp dataAdicionado) {
-        this.dataAdicionado = dataAdicionado;
-    }
 }

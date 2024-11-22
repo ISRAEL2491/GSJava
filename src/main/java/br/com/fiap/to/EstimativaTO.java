@@ -1,63 +1,40 @@
 package br.com.fiap.to;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.Date;
 
 public class EstimativaTO {
-    private Integer idEstimativa;
-
-    @NotNull(message = "O ID do usuário não pode ser nulo")
-    private Integer idUsuario;
-
-    @NotNull(message = "O ID da tarifa não pode ser nulo")
-    private Integer idTarifa;
+    private Long idEstimativa;
 
     @NotNull(message = "O consumo estimado não pode ser nulo")
     private Float consumoEstimado;
 
     @NotNull(message = "A data de início não pode ser nula")
-    private LocalDate dataInicio;
+    private Date dataInicio;
 
-    private LocalDate dataFim;
+    private Date dataFim;
 
     // Construtor sem parâmetros
     public EstimativaTO() {
     }
 
     // Construtor com parâmetros
-    public EstimativaTO(@NotNull Integer idEstimativa, @NotNull Integer idUsuario, @NotNull Integer idTarifa,
-                        @NotNull Float consumoEstimado, @NotNull LocalDate dataInicio, LocalDate dataFim) {
+    public EstimativaTO(@NotNull Long idEstimativa,
+                        @NotNull Float consumoEstimado, @NotNull Date dataInicio, Date dataFim) {
         this.idEstimativa = idEstimativa;
-        this.idUsuario = idUsuario;
-        this.idTarifa = idTarifa;
         this.consumoEstimado = consumoEstimado;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
     }
 
     // Getters e Setters
-    public Integer getIdEstimativa() {
+    public Long getIdEstimativa() {
         return idEstimativa;
     }
 
-    public void setIdEstimativa(Integer idEstimativa) {
+    public void setIdEstimativa(Long idEstimativa) {
         this.idEstimativa = idEstimativa;
-    }
-
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public Integer getIdTarifa() {
-        return idTarifa;
-    }
-
-    public void setIdTarifa(Integer idTarifa) {
-        this.idTarifa = idTarifa;
     }
 
     public Float getConsumoEstimado() {
@@ -68,19 +45,19 @@ public class EstimativaTO {
         this.consumoEstimado = consumoEstimado;
     }
 
-    public LocalDate getDataInicio() {
-        return dataInicio;
+    public java.sql.Date getDataInicio() {
+        return (java.sql.Date) dataInicio;
     }
 
-    public void setDataInicio(LocalDate dataInicio) {
+    public void setDataInicio(Date dataInicio) {
         this.dataInicio = dataInicio;
     }
 
-    public LocalDate getDataFim() {
-        return dataFim;
+    public java.sql.Date getDataFim() {
+        return (java.sql.Date) dataFim;
     }
 
-    public void setDataFim(LocalDate dataFim) {
+    public void setDataFim(Date dataFim) {
         this.dataFim = dataFim;
     }
 }
